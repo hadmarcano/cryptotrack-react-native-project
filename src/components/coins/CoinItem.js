@@ -1,11 +1,11 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, Platform} from 'react-native';
+import {View, Text, Image, Pressable, StyleSheet, Platform} from 'react-native';
 import UpIcon from '../../assets/arrow_up.png';
 import DownIcon from '../../assets/arrow_down.png';
 import Colors from '../../res/colors';
 
 const CoinsItem = props => {
-  const {item} = props;
+  const {item, onPress} = props;
 
   const getUrlImg = data => {
     if (data > 0) {
@@ -23,6 +23,7 @@ const CoinsItem = props => {
       borderBottomColor: Colors.zircon,
       borderBottomWidth: 1,
       marginLeft: Platform.OS == 'ios' ? 16 : 0,
+      paddingLeft: Platform.OS == 'ios' ? 0 : 16,
     },
     row: {
       flexDirection: 'row',
@@ -55,7 +56,7 @@ const CoinsItem = props => {
   });
 
   return (
-    <View style={styles.container}>
+    <Pressable onPress={onPress} style={styles.container}>
       <View style={styles.row}>
         <Text style={styles.symbolText}>{item.symbol}</Text>
         <Text style={styles.nameText}>{item.name}</Text>
@@ -68,7 +69,7 @@ const CoinsItem = props => {
           source={getUrlImg(item.percent_change_1h)}
         />
       </View>
-    </View>
+    </Pressable>
   );
 };
 

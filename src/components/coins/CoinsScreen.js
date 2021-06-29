@@ -32,9 +32,9 @@ const CoinsScreen = props => {
       });
   };
 
-  const handlePress = () => {
+  const handlePress = coin => {
     console.log('go to detail', props);
-    navigation.navigate('CoinDetail');
+    navigation.navigate('CoinDetail', {coin});
   };
 
   const styles = StyleSheet.create({
@@ -71,7 +71,13 @@ const CoinsScreen = props => {
       ) : (
         <FlatList
           data={coins}
-          renderItem={({item}) => <CoinsItem key={item.id} item={item} />}
+          renderItem={({item}) => (
+            <CoinsItem
+              key={item.id}
+              item={item}
+              onPress={() => handlePress(item)}
+            />
+          )}
         />
       )}
     </View>

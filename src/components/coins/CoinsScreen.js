@@ -9,11 +9,13 @@ import {
   StyleSheet,
 } from 'react-native';
 import CoinsItem from './CoinItem';
+import CoinsSearch from './CoinsSearch';
 import Colors from '../../res/colors';
 
 const CoinsScreen = props => {
   const {navigation} = props;
   const [coins, setCoins] = useState([]);
+  const [allCoins, setAllCoins] = useState([]);
   const [Loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const CoinsScreen = props => {
       .then(response => {
         // console.log(response);
         setCoins(response.data);
+        setAllCoins(response.data);
         setLoading(false);
       });
   };
@@ -35,6 +38,16 @@ const CoinsScreen = props => {
   const handlePress = coin => {
     console.log('go to detail', props);
     navigation.navigate('CoinDetail', {coin});
+  };
+
+  const handleSearch = query => {
+    const coinsFiltered = allCoins.filter(coin => {
+      return (
+        coin.name.toLowerCase().includes(query.toLowerCase()) ||
+        coin.symbol.toLowerCase().includes(query.toLowerCase())
+      );
+    });
+    setCoins(coinsFiltered);
   };
 
   const styles = StyleSheet.create({
@@ -62,6 +75,7 @@ const CoinsScreen = props => {
 
   return (
     <View style={styles.container}>
+      <CoinsSearch onChange={handleSearch} />
       {/* <Text style={styles.titleText}>BIENVENIDOS A COINS SCREEN</Text>
       <Pressable style={styles.btn} onPress={handlePress}>
         <Text style={styles.btnText}>Ir a Detail</Text>

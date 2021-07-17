@@ -76,10 +76,6 @@ const CoinsScreen = props => {
   return (
     <View style={styles.container}>
       <CoinsSearch onChange={handleSearch} />
-      {/* <Text style={styles.titleText}>BIENVENIDOS A COINS SCREEN</Text>
-      <Pressable style={styles.btn} onPress={handlePress}>
-        <Text style={styles.btnText}>Ir a Detail</Text>
-      </Pressable> */}
       {Loading ? (
         <ActivityIndicator style={styles.loader} color="#FFF" size="large" />
       ) : (

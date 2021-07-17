@@ -8,6 +8,7 @@ const CoinMarketItem = ({item}) => {
       backgroundColor: 'rgba(0,0,0,0.1)',
       borderColor: Colors.zircon,
       borderWidth: 1,
+      borderRadius: 20,
       padding: 16,
       marginRight: 8,
       alignItems: 'center',

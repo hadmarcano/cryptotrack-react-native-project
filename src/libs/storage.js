@@ -36,12 +36,13 @@ module.exports = {
     let values;
     try {
       values = await AsyncStorage.multiGet(keys);
+      console.log(values);
+      return values;
     } catch (e) {
       // read error
       console.log('storage multiGet error :', e);
       throw Error(e);
     }
-    console.log(values);
 
     // example console.log output:
     // [ ['@MyApp_user', 'myUserValue'], ['@MyApp_key', 'myKeyValue'] ]

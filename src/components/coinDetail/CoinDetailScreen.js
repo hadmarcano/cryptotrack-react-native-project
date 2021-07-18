@@ -6,20 +6,25 @@ import {
   Image,
   SectionList,
   FlatList,
+  Pressable,
+  Alert,
   StyleSheet,
 } from 'react-native';
 import CoinMarketItem from './CoinMarketItem';
 import Colors from '../../res/colors';
 import Http from '../../libs/http';
+import Storage from '../../libs/storage';
 
 const CoinDetailScreen = props => {
   const {coin} = props.route.params;
   const [markets, setMarkets] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     console.log(coin);
     props.navigation.setOptions({title: coin.symbol});
     getMarkets(coin.id);
+    getFavorite(coin.id);
   }, []);
 
   const getSymbolIcon = nameStr => {
@@ -50,6 +55,57 @@ const CoinDetailScreen = props => {
     return sections;
   };
 
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      // remove from favorites
+      removeFromFavorite();
+    } else {
+      // add to favorites
+      addToFavorite();
+    }
+  };
+
+  const addToFavorite = async () => {
+    const key = `favorite-${coin.id}`;
+    const stored = await Storage.storeData(key, coin);
+    console.log('stored', stored);
+    if (stored) {
+      setIsFavorite(true);
+    }
+  };
+
+  const removeFromFavorite = () => {
+    Alert.alert('Remove Favorite', 'Are you sure?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Removed'),
+        style: 'cancel',
+      },
+      {
+        text: 'Remove',
+        onPress: async () => {
+          const key = `favorite-${coin.id}`;
+          const removed = await Storage.removeValue(key);
+          console.log('removed', removed);
+          if (removed) {
+            setIsFavorite(false);
+          }
+        },
+      },
+    ]);
+  };
+
+  const getFavorite = async id => {
+    try {
+      const key = `favorite-${id}`;
+      const favStr = await Storage.getData(key);
+      console.log('FOVORITO', favStr);
+      if (favStr != null) setIsFavorite(true);
+    } catch (error) {
+      console.log('Get favorite error :', error);
+    }
+  };
+
   const getMarkets = async coinId => {
     let result = [];
     const url = `https://api.coinlore.net/api/coin/markets/?id=${coinId}`;
@@ -71,11 +127,13 @@ const CoinDetailScreen = props => {
       backgroundColor: 'rgba(0,0,0,0.1)',
       padding: 16,
       flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
     },
     titleText: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: '#fff',
+      color: Colors.white,
       marginLeft: 8,
     },
     iconImage: {
@@ -89,6 +147,9 @@ const CoinDetailScreen = props => {
       maxHeight: 100,
       paddingLeft: 16,
     },
+    row: {
+      flexDirection: 'row',
+    },
     sectionHeader: {
       backgroundColor: 'rgba(0,0,0, 0.2)',
       padding: 8,
@@ -97,31 +158,56 @@ const CoinDetailScreen = props => {
       padding: 8,
     },
     sectionText: {
-      color: '#fff',
+      color: Colors.white,
       fontSize: 14,
       fontWeight: 'bold',
     },
     itemText: {
-      color: '#fff',
+      color: Colors.white,
       fontSize: 14,
     },
     marketTitle: {
-      color: '#fff',
+      color: Colors.white,
       fontWeight: 'bold',
       fontSize: 16,
       marginLeft: 16,
       marginBottom: 16,
+    },
+    btnFavorite: {
+      padding: 8,
+      borderRadius: 8,
+    },
+    btnFavoriteText: {
+      color: Colors.white,
+    },
+    btnFavoriteAdd: {
+      backgroundColor: Colors.picton,
+    },
+    btnFavoriteRemove: {
+      backgroundColor: Colors.carmine,
     },
   });
 
   return (
     <View style={styles.container}>
       <View style={styles.subHeader}>
-        <Image
-          style={styles.iconImage}
-          source={{uri: getSymbolIcon(coin.nameid)}}
-        />
-        <Text style={styles.titleText}>{coin.name}</Text>
+        <View style={styles.row}>
+          <Image
+            style={styles.iconImage}
+            source={{uri: getSymbolIcon(coin.nameid)}}
+          />
+          <Text style={styles.titleText}>{coin.name}</Text>
+        </View>
+        <Pressable
+          onPress={toggleFavorite}
+          style={[
+            styles.btnFavorite,
+            isFavorite ? styles.btnFavoriteRemove : styles.btnFavoriteAdd,
+          ]}>
+          <Text style={styles.btnFavoriteText}>
+            {isFavorite ? 'Remove favorite' : 'Add favorite'}
+          </Text>
+        </Pressable>
       </View>
       <SectionList
         style={styles.section}
